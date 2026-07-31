@@ -149,6 +149,16 @@ footer{margin-top:30px;font-size:12px;color:var(--muted);text-align:center;}
 </div>
 
 <script>
+/* ============================================================
+   CHAT BACKEND CONFIG
+   Leave blank to use Cowork's built-in assistant (when open in Cowork).
+   To make the "Ask a question" box work on a HOSTED page (GitHub Pages,
+   etc.), deploy the included Cloudflare Worker and paste its URL below,
+   e.g. "https://cca-chat.YOUR-SUBDOMAIN.workers.dev".
+   Never put your Anthropic API key here — it stays secret in the Worker.
+   ============================================================ */
+const CHAT_PROXY_URL="https://sentry-rca-chat.anush-160.workers.dev";
+
 const DOMC={0:'var(--d0)',1:'var(--d1)',2:'var(--d2)',3:'var(--d3)',4:'var(--d4)',5:'var(--d5)'};
 const DOMNAME={1:'Agentic Architecture & Orchestration',2:'Tool Design & MCP Integration',3:'Claude Code Configuration & Workflows',4:'Prompt Engineering & Structured Output',5:'Context Management & Reliability'};
 const DOMWT={1:'27%',2:'18%',3:'20%',4:'20%',5:'15%'};
@@ -987,12 +997,21 @@ async function askQuestion(){
     `Stay accurate to how Claude Agent SDK, Claude Code, MCP, and the Claude API actually work. If the question is outside this lesson, answer briefly and gently point back to the relevant idea.`;
   let answer='';
   try{
-    const r=await window.cowork.askClaude(prompt,[]);
-    answer = typeof r==='string'? r : (r && (r.text||r.answer||r.content||r.message)) || '';
-    if(typeof answer!=='string') answer=JSON.stringify(answer);
+    if(window.cowork && window.cowork.askClaude){
+      const r=await window.cowork.askClaude(prompt,[]);
+      answer = typeof r==='string'? r : (r && (r.text||r.answer||r.content||r.message)) || '';
+      if(typeof answer!=='string') answer=JSON.stringify(answer);
+    } else if(CHAT_PROXY_URL){
+      const resp=await fetch(CHAT_PROXY_URL,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({prompt})});
+      const data=await resp.json().catch(()=>({}));
+      if(!resp.ok) throw new Error((data&&data.error)||('HTTP '+resp.status));
+      answer=(data.text||'').toString().trim();
+    } else {
+      answer='This chat needs a backend when hosted. Set CHAT_PROXY_URL near the top of the file to your Cloudflare Worker URL (see the setup notes), or open the app inside Cowork.';
+    }
     if(!answer) answer='(No answer returned. Try rephrasing your question.)';
   }catch(e){
-    answer='I couldn’t reach the assistant from here. This question box works when the app is open inside Cowork. You can also just ask me directly in the chat.';
+    answer='I couldn’t reach the assistant. Check that your backend proxy URL is correct and the Worker is deployed. (Details: '+escapeHtml(String(e.message||e))+')';
   }
   answer = escapeHtml(answer).replace(/`([^`]+)`/g,'<code>$1</code>').replace(/\n/g,'<br>');
   state.qa[i]=state.qa[i]||[]; state.qa[i].push({q,a:answer}); save();
