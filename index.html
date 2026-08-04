@@ -165,21 +165,6 @@ const DOMWT={1:'27%',2:'18%',3:'20%',4:'20%',5:'15%'};
 
 /* ---------------- LESSONS ---------------- */
 const LESSONS=[
-{dom:0,title:'How this exam works',body:`
-<p>Before any technical topic, get the lay of the land. The <b>Claude Certified Architect – Foundations</b> exam checks whether you can make good <i>tradeoff</i> decisions when building real things with Claude. It is not about memorizing trivia — almost every question is a realistic production scenario where you pick the best of four options.</p>
-<h4>The five domains (and how much each counts)</h4>
-<ul>
-<li><b>Domain 1 — Agentic Architecture & Orchestration (27%)</b>: how agents loop, and how multiple agents coordinate. Biggest slice.</li>
-<li><b>Domain 2 — Tool Design & MCP Integration (18%)</b>: designing tools and connecting backend systems.</li>
-<li><b>Domain 3 — Claude Code Configuration & Workflows (20%)</b>: setting up Claude Code for a team.</li>
-<li><b>Domain 4 — Prompt Engineering & Structured Output (20%)</b>: reliable prompts and machine-readable output.</li>
-<li><b>Domain 5 — Context Management & Reliability (15%)</b>: keeping long sessions accurate and handling failure.</li>
-</ul>
-<p>Questions are grouped under 6 scenarios; on exam day you see 4 of them, chosen at random. All questions are multiple choice with one right answer and three "distractors" — wrong options that someone with shaky knowledge would fall for.</p>
-<div class="callout check"><b>How it's scored:</b> a scaled score from 100–1000; you need <b>720</b> to pass. There is no penalty for guessing, so never leave a question blank.</div>
-<div class="callout trap"><b>Exam mindset:</b> when two answers both "work," the exam usually rewards the one that fixes the <i>root cause</i> with the least over-engineering, and prefers <i>deterministic</i> guarantees over hoping the model behaves.</div>
-`},
-
 {dom:1,title:'The agentic loop',body:`
 <p>This is the single most-tested mechanic, so it's worth getting really comfortable. A simple Claude call is one round trip: you ask, it answers. An <b>agent</b> is different — it can use <b>tools</b> (look up an order, search the web, run code) across several steps. The "agentic loop" is the repeating cycle that makes that possible.</p>
 <h4>The cycle, in plain terms</h4>
@@ -740,6 +725,9 @@ const LESSONQUIZ={
  {q:'Reports should distinguish…',o:['Well-established findings from contested ones','Nothing — treat all findings the same'],ans:0,ex:'Separating established vs contested preserves nuance.'}
 ]
 };
+
+/* The intro lesson was removed, so shift the quiz map down by one to realign with lesson indices. */
+(function(){var s={};Object.keys(LESSONQUIZ).forEach(function(k){var n=+k;if(n>=1)s[n-1]=LESSONQUIZ[n];});Object.keys(LESSONQUIZ).forEach(function(k){delete LESSONQUIZ[k];});Object.assign(LESSONQUIZ,s);})();
 
 /* ---------------- FLASHCARDS / QUIZ / REFERENCE ---------------- */
 const FLASHCARDS=[
